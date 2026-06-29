@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { admin } from '../../lib/api'
 import { Card, EmptyState, Input, Spinner, rupee } from '../../components/ui'
-import { PUBLIC_BASE_URL } from '../../lib/supabase'
 
 export default function AdminWorkers() {
   const [search, setSearch] = useState('')
@@ -31,7 +30,7 @@ export default function AdminWorkers() {
                   <td className="px-4 py-2 text-ink-soft">{w.state || '—'}</td>
                   <td className="px-4 py-2">{w.employers}</td>
                   <td className="px-4 py-2">{rupee(w.total_wages)}</td>
-                  <td className="px-4 py-2"><a className="text-brand-700 hover:underline" href={`${PUBLIC_BASE_URL}/verify/passbook/${w.public_id}`} target="_blank" rel="noreferrer">View ↗</a></td>
+                  <td className="px-4 py-2"><a className="text-brand-700 hover:underline" href={`/verify/passbook/${w.public_id}`} target="_blank" rel="noreferrer">View ↗</a></td>
                 </tr>
               ))}
             </tbody>

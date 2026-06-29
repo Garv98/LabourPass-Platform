@@ -11,5 +11,8 @@ export const supabase = createClient(url ?? 'http://localhost', anonKey ?? 'publ
   auth: { persistSession: false, autoRefreshToken: false },
 })
 
-export const PUBLIC_BASE_URL =
+// Used only for shareable/printable links (QR, PDF, copy-to-share). In-app
+// navigation uses relative paths so it never depends on this value.
+export const PUBLIC_BASE_URL = (
   (import.meta.env.VITE_PUBLIC_BASE_URL as string | undefined) ?? window.location.origin
+).replace(/\/+$/, '')

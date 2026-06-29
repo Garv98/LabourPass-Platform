@@ -6,7 +6,6 @@ import type { WorkerRow } from '../../lib/api'
 import { Badge, Button, Card, EmptyState, Field, Input, Select, Spinner } from '../../components/ui'
 import { Modal } from '../../components/Modal'
 import { SKILLS, prettySkill } from '../../lib/constants'
-import { PUBLIC_BASE_URL } from '../../lib/supabase'
 
 export default function Certificates() {
   const qc = useQueryClient()
@@ -35,7 +34,7 @@ export default function Certificates() {
               </div>
               <div className="flex items-center gap-2">
                 {c.is_revoked ? <Badge color="red">Revoked</Badge> : <Badge color="green">Valid</Badge>}
-                <a className="text-sm font-semibold text-brand-700 hover:underline" href={`${PUBLIC_BASE_URL}/verify/cert/${c.certificate_no}`} target="_blank" rel="noreferrer">Verify ↗</a>
+                <a className="text-sm font-semibold text-brand-700 hover:underline" href={`/verify/cert/${c.certificate_no}`} target="_blank" rel="noreferrer">Verify ↗</a>
               </div>
             </Card>
           ))}
