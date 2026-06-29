@@ -3,14 +3,18 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// LabourPass PWA — offline-first employer dashboard.
-// Service worker precaches the app shell; runtime caching for Supabase reads.
+// LabourPass PWA. Custom service worker (injectManifest) so we can handle
+// Web Push notifications in addition to offline precaching.
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       includeAssets: ['favicon.svg'],
       manifest: {
         name: 'LabourPass',
@@ -26,20 +30,10 @@ export default defineConfig({
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
-        navigateFallbackDenylist: [/^\/api/],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/rest/v1'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-reads',
-              networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 },
-            },
-          },
-        ],
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
       },
+      devOptions: { enabled: false },
     }),
   ],
   server: { port: 5173 },

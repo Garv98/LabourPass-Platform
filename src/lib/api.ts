@@ -71,6 +71,7 @@ export const employer = {
   recentActivity: () => authed<Activity[]>('emp_recent_activity'),
   alerts: () => authed<EmpAlerts>('emp_alerts'),
   updateProfile: (payload: Record<string, unknown>) => authed<Employer>('emp_update_profile', { p_payload: payload }),
+  savePush: (sub: Record<string, unknown>) => authed('emp_save_push', { p_sub: sub }),
 }
 
 // ---------------- ADMIN ----------------
@@ -98,6 +99,7 @@ export const pub = {
   ledger: (publicId: string) => rpc<Ledger>('pub_ledger', { p_public_id: publicId }),
   demoTamper: (publicId: string, restore: boolean) => rpc<{ tampered: boolean }>('demo_tamper', { p_public_id: publicId, p_restore: restore }),
   smsInbound: (sender: string, body: string) => rpc<{ reply: string }>('sms_inbound', { p_sender: sender, p_body: body }),
+  savePush: (publicId: string, sub: Record<string, unknown>) => rpc('pub_save_push', { p_public_id: publicId, p_sub: sub }),
 }
 
 // ---------------- types ----------------

@@ -9,6 +9,7 @@ import { db } from '../../lib/offline'
 import { Button, Field, Input, Spinner, rupee } from '../../components/ui'
 import { Modal } from '../../components/Modal'
 import { Emblem } from '../../components/Emblem'
+import { PushButton } from '../../components/PushButton'
 import { useOnline } from '../../lib/useOnline'
 import { setSession } from '../../lib/session'
 
@@ -61,6 +62,7 @@ export default function EmployerDashboard() {
             <span className="lp-status text-amber-ink">○ ऑफ़लाइन / Offline — entries will sync later</span>
           )}
           {pending! > 0 && <span className="lp-status text-stamp">⟳ {pending} बाकी / waiting to sync</span>}
+          <PushButton save={employer.savePush} label="Enable alerts" className="ml-auto min-h-10 border-2 border-band bg-white px-3 text-sm font-semibold text-band hover:bg-paper disabled:opacity-60" />
         </div>
       </div>
 

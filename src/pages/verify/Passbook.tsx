@@ -7,6 +7,7 @@ import type { ChainVerify } from '../../lib/api'
 import { Spinner, rupee } from '../../components/ui'
 import { QR } from '../../components/QR'
 import { Emblem } from '../../components/Emblem'
+import { PushButton } from '../../components/PushButton'
 import { passbookPdf } from '../../lib/pdf'
 import { prettySkill } from '../../lib/constants'
 
@@ -79,6 +80,11 @@ export default function VerifyPassbook() {
             <div className="flex flex-col items-center gap-1">
               <QR value={url} size={96} />
               <span className="text-xs font-semibold text-ink-soft">स्कैन करें · Scan to verify</span>
+              <PushButton
+                save={(sub) => pub.savePush(publicId!, sub)}
+                label="Get wage alerts"
+                className="lp-noprint mt-1 min-h-10 border-2 border-band bg-white px-2 text-sm font-semibold text-band hover:bg-paper disabled:opacity-60"
+              />
             </div>
           </section>
 
