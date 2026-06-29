@@ -48,7 +48,9 @@ export const auth = {
 // ---------------- EMPLOYER ----------------
 export const employer = {
   me: () => authed<EmployerMe>('emp_me'),
-  registerWorker: (payload: Record<string, unknown>) => authed('emp_register_worker', { p_payload: payload }),
+  registerWorker: (payload: Record<string, unknown>) =>
+    authed<{ worker: { id: string }; engagement_id: string }>('emp_register_worker', { p_payload: payload }),
+  setChannel: (workerId: string, channel: string) => authed('emp_set_channel', { p_worker: workerId, p_channel: channel }),
   listWorkers: (search?: string) => authed<WorkerRow[]>('emp_list_workers', { p_search: search ?? null }),
   workerDetail: (workerId: string) => authed<WorkerDetail>('emp_worker_detail', { p_worker: workerId }),
   listWorksites: () => authed<Worksite[]>('emp_list_worksites'),

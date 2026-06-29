@@ -85,13 +85,18 @@ function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]
     worksite_id: worksites[0]?.id ?? '',
   })
   const [skills, setSkills] = useState<string[]>([])
+  const [channel, setChannel] = useState('both')
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
   const toggleSkill = (s: string) => setSkills((arr) => (arr.includes(s) ? arr.filter((x) => x !== s) : [...arr, s]))
 
   const mut = useMutation({
-    mutationFn: () => employer.registerWorker({ ...form, skills, worksite_id: form.worksite_id || null }),
+    mutationFn: async () => {
+      const res = await employer.registerWorker({ ...form, skills, worksite_id: form.worksite_id || null })
+      if (res?.worker?.id) await employer.setChannel(res.worker.id, channel)
+      return res
+    },
     onSuccess: () => {
-      toast.success('Worker registered — SMS sent to phone')
+      toast.success('Worker registered — confirmation sent to their phone')
       onSaved()
     },
     onError: (e) => toast.error((e as Error).message),
@@ -125,11 +130,21 @@ function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]
           <Field label="Role"><Input value={form.role_title} onChange={(e) => set('role_title', e.target.value)} /></Field>
         </div>
 
-        <Field label="SMS Language">
-          <Select value={form.preferred_language} onChange={(e) => set('preferred_language', e.target.value)}>
-            {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
-          </Select>
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="SMS Language">
+            <Select value={form.preferred_language} onChange={(e) => set('preferred_language', e.target.value)}>
+              {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+            </Select>
+          </Field>
+          <Field label="Notify via">
+            <Select value={channel} onChange={(e) => setChannel(e.target.value)}>
+              <option value="both">SMS + WhatsApp</option>
+              <option value="sms">SMS only</option>
+              <option value="whatsapp">WhatsApp only</option>
+              <option value="none">No messages</option>
+            </Select>
+          </Field>
+        </div>
 
         <div>
           <span className="mb-1 block text-sm font-medium text-ink-soft">Skills</span>

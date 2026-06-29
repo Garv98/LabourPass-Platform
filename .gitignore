@@ -15,8 +15,9 @@ dist-ssr
 .env.*
 !.env.example
 
-# holds the webhook secret — keep out of git
+# hold the webhook secret — keep out of git
 supabase/push_triggers.sql
+supabase/notify_triggers.sql
 
 # Editor directories and files
 .vscode/*
