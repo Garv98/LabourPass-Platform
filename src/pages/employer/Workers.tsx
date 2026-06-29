@@ -92,7 +92,12 @@ function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]
   const mut = useMutation({
     mutationFn: async () => {
       const res = await employer.registerWorker({ ...form, skills, worksite_id: form.worksite_id || null })
-      if (res?.worker?.id) await employer.setChannel(res.worker.id, channel)
+      // best-effort: a channel-set failure must not fail the registration
+      try {
+        if (res?.worker?.id) await employer.setChannel(res.worker.id, channel)
+      } catch {
+        /* ignore */
+      }
       return res
     },
     onSuccess: () => {
