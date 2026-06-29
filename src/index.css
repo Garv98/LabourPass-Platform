@@ -1,0 +1,216 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+
+  /* Government work-passbook palette: manila stock + official ink + stamp */
+  --color-paper: #f3ecd8;
+  --color-paper-edge: #e7dcbf;
+  --color-ink: #15302b;
+  --color-ink-soft: #4a5b52;
+  --color-band: #0f766e;
+  --color-band-deep: #0b4f4a;
+  --color-stamp: #b3361f;
+  --color-stamp-soft: #f3e2dd;
+  --color-rule: #cabd96;
+  --color-paid: #1f7a3d;
+  --color-amber-ink: #8a5a00;
+
+  --font-sans: 'Hind', system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  font-family: var(--font-sans);
+  font-size: 16px; /* WCAG base */
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Accessible focus ring everywhere */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-stamp);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Work-passbook design primitives (govt document language)
+   ============================================================ */
+@layer components {
+  /* manila document page background */
+  .lp-paper {
+    background-color: var(--color-paper);
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in srgb, var(--color-rule) 18%, transparent) 27px 28px);
+  }
+
+  /* the document sheet */
+  .lp-sheet {
+    background: #fffdf6;
+    border: 2px solid var(--color-ink);
+    box-shadow: 6px 6px 0 0 var(--color-paper-edge);
+  }
+
+  /* official header band (the colored cover of a job card) */
+  .lp-band {
+    background: var(--color-band-deep);
+    color: #fdfae9;
+  }
+
+  /* bilingual section eyebrow: देवनागरी / LATIN */
+  .lp-eyebrow {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    border-bottom: 2px solid var(--color-rule);
+    padding-bottom: 0.35rem;
+    margin-bottom: 0.85rem;
+  }
+
+  /* ruled ledger table — muster roll */
+  .lp-ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .lp-ledger th {
+    text-align: left;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid var(--color-ink);
+  }
+  .lp-ledger td {
+    padding: 0.7rem 0.75rem;
+    border-bottom: 1px solid var(--color-rule);
+    font-size: 1rem;
+    color: var(--color-ink);
+  }
+
+  /* boxed registration-number cells (the signature element) */
+  .lp-serial {
+    display: inline-flex;
+    gap: 4px;
+    font-family: ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .lp-serial span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.6rem;
+    height: 2rem;
+    padding: 0 0.15rem;
+    border: 1.5px solid var(--color-ink);
+    background: #fffdf6;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* vermilion rubber stamp */
+  .lp-stamp {
+    color: var(--color-stamp);
+    border: 3px double var(--color-stamp);
+    border-radius: 6px;
+    padding: 0.35rem 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.05;
+    transform: rotate(-7deg);
+    opacity: 0.92;
+    text-align: center;
+  }
+
+  /* status chip: always icon + word + colour (never colour alone) */
+  .lp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+
+  /* big on-site action button (>=64px, dusty-hands friendly) */
+  .lp-action {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    min-height: 72px;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--color-ink);
+    background: #fffdf6;
+    color: var(--color-ink);
+    font-weight: 600;
+    text-align: left;
+  }
+  .lp-action:hover {
+    background: var(--color-paper);
+  }
+  .lp-action--primary {
+    background: var(--color-band);
+    border-color: var(--color-band-deep);
+    color: #fdfae9;
+  }
+  .lp-action--primary:hover {
+    background: var(--color-band-deep);
+  }
+
+  /* perforated divider (folded booklet feel) */
+  .lp-perf {
+    border: 0;
+    border-top: 2px dashed var(--color-rule);
+    margin: 0;
+  }
+}
+
+/* ============================================================
+   Print: passbook prints as a clean official document
+   ============================================================ */
+@media print {
+  .lp-noprint {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .lp-paper {
+    background: #fff;
+  }
+  .lp-sheet {
+    box-shadow: none;
+    border-color: #000;
+  }
+  .lp-band {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
