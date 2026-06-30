@@ -9,6 +9,7 @@ interface Msg {
   direction: 'outbound' | 'inbound'
   message: string
   created_at: string
+  reference_type?: string | null
 }
 interface Contact {
   phone: string
@@ -90,7 +91,7 @@ export function PhoneSim({ compact = false }: { compact?: boolean }) {
     setMsgs([])
     supabase
       .from('sms_logs')
-      .select('id,direction,message,created_at')
+      .select('id,direction,message,created_at,reference_type')
       .eq('phone', phone)
       .order('created_at', { ascending: true })
       .limit(50)
@@ -115,13 +116,12 @@ export function PhoneSim({ compact = false }: { compact?: boolean }) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [msgs])
 
-  // latest 6-digit OTP from an incoming (outbound→phone) message
+  // Copy-OTP only when the most recent message is an OTP (so it doesn't linger).
   const lastOtp = useMemo(() => {
-    for (let i = msgs.length - 1; i >= 0; i--) {
-      if (msgs[i].direction === 'outbound') {
-        const m = msgs[i].message.match(/\b(\d{6})\b/)
-        if (m) return m[1]
-      }
+    const last = msgs[msgs.length - 1]
+    if (last && last.direction === 'outbound' && last.reference_type === 'otp') {
+      const m = last.message.match(/\b(\d{6})\b/)
+      if (m) return m[1]
     }
     return null
   }, [msgs])
