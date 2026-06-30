@@ -1,14 +1,13 @@
 // Supabase Edge Function: notify-send
 // Fired by a trigger on every OUTBOUND sms_logs row. Delivers the message to
-// the worker's real phone via Fast2SMS (SMS) and/or WhatsApp Cloud API,
-// based on the worker's notify_channel. Cost is capped by an allowlist: only
-// numbers in SMS_LIVE_NUMBERS get a real send; everyone else stays simulated.
+// the worker's real phone via WhatsApp Cloud API when the worker's channel is
+// 'whatsapp' or 'both'. ('sms'/'none' = simulated only — shown on the in-app
+// demo phone, no real SMS provider.) Cost is capped by an allowlist.
 //
 // Deploy:  supabase functions deploy notify-send --no-verify-jwt
 // Secrets:
 //   supabase secrets set WEBHOOK_SECRET=... \
 //     SMS_LIVE_NUMBERS=9876543210,9000000001 \
-//     FAST2SMS_API_KEY=... \
 //     WHATSAPP_TOKEN=... WHATSAPP_PHONE_ID=...
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -24,21 +23,8 @@ const ALLOWLIST = (Deno.env.get('SMS_LIVE_NUMBERS') ?? '')
   .map((s) => s.trim())
   .filter(Boolean)
 
-const FAST2SMS_API_KEY = Deno.env.get('FAST2SMS_API_KEY')
 const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_TOKEN')
 const WHATSAPP_PHONE_ID = Deno.env.get('WHATSAPP_PHONE_ID')
-
-async function sendSms(phone: string, message: string) {
-  if (!FAST2SMS_API_KEY) throw new Error('FAST2SMS_API_KEY not set')
-  const res = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-    method: 'POST',
-    headers: { authorization: FAST2SMS_API_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ route: 'q', message, language: 'english', flash: '0', numbers: phone }),
-  })
-  const text = await res.text()
-  if (!res.ok) throw new Error(`fast2sms ${res.status}: ${text}`)
-  return 'sms'
-}
 
 async function sendWhatsApp(phone: string, message: string) {
   if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID) throw new Error('WhatsApp creds not set')
@@ -69,22 +55,21 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ skipped: 'not allowlisted', phone }), { status: 200 })
   }
 
-  // Worker channel preference (employer OTP etc. have no worker row → SMS).
   const { data: worker } = await supabase.from('workers').select('notify_channel').eq('phone', phone).maybeSingle()
-  const channel: string = worker?.notify_channel ?? 'sms'
-  if (channel === 'none') return new Response('channel none', { status: 200 })
+  const channel: string = worker?.notify_channel ?? 'whatsapp'
+
+  // Only WhatsApp is a real channel now. 'sms'/'none' stay simulated (demo phone only).
+  if (channel !== 'whatsapp' && channel !== 'both') {
+    return new Response(JSON.stringify({ simulated: true, channel }), { status: 200 })
+  }
 
   const used: string[] = []
   const errors: string[] = []
-  const tasks: Promise<void>[] = []
-
-  if (channel === 'sms' || channel === 'both') {
-    tasks.push(sendSms(phone, message).then((c) => { used.push(c) }).catch((e) => errors.push(String(e))))
+  try {
+    used.push(await sendWhatsApp(phone, message))
+  } catch (e) {
+    errors.push(String(e))
   }
-  if (channel === 'whatsapp' || channel === 'both') {
-    tasks.push(sendWhatsApp(phone, message).then((c) => { used.push(c) }).catch((e) => errors.push(String(e))))
-  }
-  await Promise.all(tasks)
 
   await supabase
     .from('sms_logs')

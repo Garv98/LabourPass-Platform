@@ -6,7 +6,7 @@ import { employer } from './api'
 // network); flushPending() drains to Supabase when back online. Idempotent
 // per (worksite,date) on the server (first-mark-wins), so replays are safe.
 export interface QueuedAttendance {
-  id: string // `${worksiteId}|${date}` — natural idempotency key
+  id: string // unique per submission — server dedups per (engagement, date)
   worksiteId: string | null
   date: string
   records: { worker_id: string; status: string }[]
@@ -29,7 +29,8 @@ export async function queueAttendance(
   date: string,
   records: { worker_id: string; status: string }[],
 ) {
-  const id = `${worksiteId ?? 'none'}|${date}`
+  // unique per submission so a second same-day batch can't overwrite the first
+  const id = `${worksiteId ?? 'none'}|${date}|${crypto.randomUUID()}`
   await db.attendanceQueue.put({ id, worksiteId, date, records, createdAt: Date.now(), synced: 0 })
   // try immediate flush; ignore failure (will retry on reconnect)
   void flushPending()

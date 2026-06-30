@@ -4,7 +4,6 @@ import { pub } from '../../lib/api'
 import { Spinner } from '../../components/ui'
 import { QR } from '../../components/QR'
 import { Emblem } from '../../components/Emblem'
-import { certificatePdf } from '../../lib/pdf'
 import { prettySkill } from '../../lib/constants'
 
 export default function VerifyCertificate() {
@@ -86,7 +85,7 @@ export default function VerifyCertificate() {
               <div className="bg-white p-1"><QR value={window.location.href} size={72} /></div>
               <span className="text-sm text-brand-100">स्कैन कर सत्यापित करें<br />Scan to verify</span>
             </div>
-            <button onClick={() => certificatePdf(data)} className="min-h-12 border-2 border-brand-200 bg-[#fdfae9] px-4 font-semibold text-band-deep hover:bg-white lp-noprint">
+            <button onClick={async () => { const { certificatePdf } = await import('../../lib/pdf'); await certificatePdf(data) }} className="min-h-12 border-2 border-brand-200 bg-[#fdfae9] px-4 font-semibold text-band-deep hover:bg-white lp-noprint">
               PDF
             </button>
           </footer>

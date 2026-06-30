@@ -5,7 +5,6 @@ import toast from 'react-hot-toast'
 import { employer, pub } from '../../lib/api'
 import { Badge, Button, Card, Spinner, rupee } from '../../components/ui'
 import { QR } from '../../components/QR'
-import { passbookPdf } from '../../lib/pdf'
 import { PUBLIC_BASE_URL } from '../../lib/supabase'
 import { prettySkill } from '../../lib/constants'
 
@@ -27,7 +26,8 @@ export default function WorkerDetail() {
     setDownloading(true)
     try {
       const pb = await pub.passbook(w.public_id as string)
-      passbookPdf(pb)
+      const { passbookPdf } = await import('../../lib/pdf')
+      await passbookPdf(pb)
     } catch (e) {
       toast.error((e as Error).message)
     } finally {

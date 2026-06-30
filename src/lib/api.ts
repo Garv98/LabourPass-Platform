@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { getToken } from './session'
+import { clearSession, getToken } from './session'
 
 // Maps Postgres RAISE exceptions to friendly messages.
 const ERRORS: Record<string, string> = {
@@ -23,7 +23,16 @@ function friendly(message: string): string {
 
 export async function rpc<T = unknown>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.rpc(fn, args)
-  if (error) throw new Error(friendly(error.message))
+  if (error) {
+    // Session expired mid-use → clear it and bounce to the sign-in hub once.
+    if (error.message.includes('UNAUTHORIZED') && getToken()) {
+      clearSession()
+      if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+        window.location.assign('/?expired=1')
+      }
+    }
+    throw new Error(friendly(error.message))
+  }
   return data as T
 }
 

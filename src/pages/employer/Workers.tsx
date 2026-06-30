@@ -144,8 +144,8 @@ function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]
           <Field label="Notify via">
             <Select value={channel} onChange={(e) => setChannel(e.target.value)}>
               <option value="both">SMS + WhatsApp</option>
-              <option value="sms">SMS only</option>
               <option value="whatsapp">WhatsApp only</option>
+              <option value="sms">SMS only</option>
               <option value="none">No messages</option>
             </Select>
           </Field>

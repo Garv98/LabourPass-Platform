@@ -8,7 +8,6 @@ import { Spinner, rupee } from '../../components/ui'
 import { QR } from '../../components/QR'
 import { Emblem } from '../../components/Emblem'
 import { PushButton } from '../../components/PushButton'
-import { passbookPdf } from '../../lib/pdf'
 import { prettySkill } from '../../lib/constants'
 
 export default function VerifyPassbook() {
@@ -170,7 +169,7 @@ export default function VerifyPassbook() {
               <button onClick={() => window.print()} className="min-h-12 border-2 border-brand-200 bg-transparent px-4 font-semibold text-[#fdfae9] hover:bg-band">
                 प्रिंट · Print
               </button>
-              <button onClick={() => passbookPdf(data)} className="min-h-12 border-2 border-brand-200 bg-[#fdfae9] px-4 font-semibold text-band-deep hover:bg-white">
+              <button onClick={async () => { const { passbookPdf } = await import('../../lib/pdf'); await passbookPdf(data) }} className="min-h-12 border-2 border-brand-200 bg-[#fdfae9] px-4 font-semibold text-band-deep hover:bg-white">
                 PDF
               </button>
             </div>

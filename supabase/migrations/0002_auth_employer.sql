@@ -151,6 +151,21 @@ begin
             nullif(p_payload->>'date_of_birth','')::date, p_payload->>'gender', p_payload->>'aadhaar_last4',
             p_payload->>'address', p_payload->>'state', p_payload->>'district', v_lang, v_emp, true)
     returning * into v_worker;
+  else
+    -- phone already exists: update name/details from this registration (last-writer-wins)
+    update workers set
+      full_name          = coalesce(nullif(p_payload->>'full_name',''), full_name),
+      father_name        = coalesce(nullif(p_payload->>'father_name',''), father_name),
+      date_of_birth      = coalesce(nullif(p_payload->>'date_of_birth','')::date, date_of_birth),
+      gender             = coalesce(nullif(p_payload->>'gender',''), gender),
+      aadhaar_last4      = coalesce(nullif(p_payload->>'aadhaar_last4',''), aadhaar_last4),
+      address            = coalesce(nullif(p_payload->>'address',''), address),
+      state              = coalesce(nullif(p_payload->>'state',''), state),
+      district           = coalesce(nullif(p_payload->>'district',''), district),
+      preferred_language = coalesce(nullif(p_payload->>'preferred_language','')::language_code, preferred_language),
+      updated_at         = now()
+    where id = v_worker.id
+    returning * into v_worker;
   end if;
 
   for v_skill in select jsonb_array_elements_text(coalesce(p_payload->'skills','[]'::jsonb)) loop
