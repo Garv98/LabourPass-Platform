@@ -81,7 +81,7 @@ export default function Workers() {
 function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState({
     full_name: '', phone: '', father_name: '', gender: 'male', aadhaar_last4: '',
-    state: '', district: '', preferred_language: 'hi', daily_wage: '', role_title: '',
+    state: '', district: '', preferred_language: '', daily_wage: '', role_title: '',
     worksite_id: worksites[0]?.id ?? '',
   })
   const [skills, setSkills] = useState<string[]>([])
@@ -138,6 +138,7 @@ function RegisterWorker({ worksites, onClose, onSaved }: { worksites: Worksite[]
         <div className="grid grid-cols-2 gap-3">
           <Field label="SMS Language">
             <Select value={form.preferred_language} onChange={(e) => set('preferred_language', e.target.value)}>
+              <option value="">Auto (by region / English)</option>
               {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
             </Select>
           </Field>
