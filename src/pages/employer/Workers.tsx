@@ -141,6 +141,20 @@ function EditWorker({ worker, onClose, onSaved }: { worker: WorkerRow; onClose: 
     onError: (e) => toast.error((e as Error).message),
   })
 
+  const removeMut = useMutation({
+    mutationFn: () => employer.removeWorker(worker.id),
+    onSuccess: (r) => {
+      toast.success(r?.result === 'deleted' ? 'Worker removed from the platform' : 'Worker removed from your roster')
+      onSaved()
+    },
+    onError: (e) => toast.error((e as Error).message),
+  })
+  function confirmRemove() {
+    if (window.confirm(`Remove ${worker.full_name} (${worker.public_id})?\n\nIf this worker works only for you, all their records are permanently deleted. Otherwise they're just removed from your roster.`)) {
+      removeMut.mutate()
+    }
+  }
+
   return (
     <Modal title={`Edit Worker · ${worker.public_id}`} onClose={onClose}>
       {isLoading ? (
@@ -190,9 +204,12 @@ function EditWorker({ worker, onClose, onSaved }: { worker: WorkerRow; onClose: 
               ))}
             </div>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={() => mut.mutate()} disabled={mut.isPending || !form.full_name}>Save changes</Button>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-rule pt-3">
+            <Button variant="danger" onClick={confirmRemove} disabled={removeMut.isPending}>🗑 Remove worker</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button onClick={() => mut.mutate()} disabled={mut.isPending || !form.full_name}>Save changes</Button>
+            </div>
           </div>
         </div>
       )}

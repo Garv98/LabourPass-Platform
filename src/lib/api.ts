@@ -62,6 +62,7 @@ export const employer = {
   setChannel: (workerId: string, channel: string) => authed('emp_set_channel', { p_worker: workerId, p_channel: channel }),
   updateWorker: (workerId: string, payload: Record<string, unknown>) =>
     authed('emp_update_worker', { p_worker: workerId, p_payload: payload }),
+  removeWorker: (workerId: string) => authed<{ result: string }>('emp_remove_worker', { p_worker: workerId }),
   listWorkers: (search?: string) => authed<WorkerRow[]>('emp_list_workers', { p_search: search ?? null }),
   workerDetail: (workerId: string) => authed<WorkerDetail>('emp_worker_detail', { p_worker: workerId }),
   listWorksites: () => authed<Worksite[]>('emp_list_worksites'),

@@ -29,3 +29,5 @@ supabase/notify_triggers.sql
 *.njsproj
 *.sln
 *.sw?
+PITCH.md
+VIDEO.md
