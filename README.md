@@ -5,6 +5,7 @@
 Attendance, wages, and experience — entered by employers on a phone, delivered to workers as SMS/WhatsApp, cryptographically **tamper-evident**, and shareable with banks and welfare boards as a verifiable record. Built feature-phone-first; works **offline**; runs on a **₹0 stack**.
 
 🔗 **Live:** https://labour-pass-platform.vercel.app
+
 📂 **Repo:** https://github.com/Garv98/LabourPass-Platform
 
 | Try it | How |
@@ -38,12 +39,12 @@ LabourPass gives the worker a record that **follows them**, that they don't depe
 
 | Feature | Why it matters |
 |---|---|
-| **🔐 Hash-chain tamper-evidence** | Every attendance/wage row is `sha256(fields ‖ prev_hash)`. The public verify page recomputes the chain and pinpoints any altered record. "Tamper-resistant" is **real**, not a slide — try the **Tamper / Restore** button on the passbook. |
-| **📴 Offline-first attendance** | Mark attendance with no network (IndexedDB queue + background sync) → auto-syncs on reconnect. The live "wow." |
-| **📲 Two-way real messaging** | Outbound wage/attendance + inbound `PROFILE/WAGES/DISPUTE/1-2` over **WhatsApp Cloud API**, plus a pixel-accurate **simulated SMS phone** for the feature-phone story (and offline/dev). One adapter swap → production SMS (MSG91/Twilio + DLT). |
-| **⭐ Crowd-sourced Employer Trust Score** | Workers rate payment reliability by a single SMS reply → rolling-90-day score, "Verified Payer" badge, admin alerts on low scores. |
-| **📊 Live Informal Wage Index** | Ground-truth avg daily wage by skill & state — data India currently has no real-time source for. |
-| **🏛️ Govt-passbook design system** | Modeled on the MGNREGA job card / wage slip — manila stock, official-ink band, boxed registration cells, rubber stamp. Built *for* the user, not *about* them. |
+| **Hash-chain tamper-evidence** | Every attendance/wage row is `sha256(fields ‖ prev_hash)`. The public verify page recomputes the chain and pinpoints any altered record. "Tamper-resistant" is **real**, not a slide — try the **Tamper / Restore** button on the passbook. |
+| **Offline-first attendance** | Mark attendance with no network (IndexedDB queue + background sync) → auto-syncs on reconnect. The live "wow." |
+| **Two-way real messaging** | Outbound wage/attendance + inbound `PROFILE/WAGES/DISPUTE/1-2` over **WhatsApp Cloud API**, plus a pixel-accurate **simulated SMS phone** for the feature-phone story (and offline/dev). One adapter swap → production SMS (MSG91/Twilio + DLT). |
+| **Crowd-sourced Employer Trust Score** | Workers rate payment reliability by a single SMS reply → rolling-90-day score, "Verified Payer" badge, admin alerts on low scores. |
+| **Live Informal Wage Index** | Ground-truth avg daily wage by skill & state — data India currently has no real-time source for. |
+| **Govt-passbook design system** | Modeled on the MGNREGA job card / wage slip — manila stock, official-ink band, boxed registration cells, rubber stamp. Built *for* the user, not *about* them. |
 
 ---
 
@@ -126,7 +127,7 @@ Two-way WhatsApp, Web Push, and the delivery triggers are wired as Supabase Edge
 
 ---
 
-## Security notes (honest)
+## Security notes
 
 - All tables **RLS-locked**; access only via token-validated `SECURITY DEFINER` RPCs. Public verify RPCs return **PII-safe** fields (no phone/Aadhaar). Aadhaar stored **last-4 only**. Admin passwords **bcrypt** (`pgcrypto crypt`). Wage writes carry **idempotency keys**; every mutation hits an append-only **audit log**.
 - **Demo-mode caveats** (by design, for the on-screen phone panel): `sms_logs` is publicly readable so the simulator can render messages — in production, OTPs would not be stored there and the read policy would be scoped. OTP generation uses `random()` (swap to crypto for production). State these on stage.
@@ -149,5 +150,3 @@ src/pages/             employer/* · admin/* · verify/* · Landing (merged logi
 Real SMS via MSG91/Twilio + DLT · worker-confirmed (two-sided) records · UPI wage rail · E-Shram / PMJDY / BOCW integrations · lender API consuming the passbook as income proof. The architecture accommodates each as an adapter, not a rewrite.
 
 ---
-
-Built for a national-level hackathon. **Feature-phone-first. Offline-capable. Tamper-evident. ₹0 to run.**
